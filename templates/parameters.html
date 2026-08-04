@@ -23,6 +23,9 @@
         <button class="tab-btn" onclick="switchTab('auth-tab', this)">
             <i class="fa-solid fa-user-shield"></i> Dados de Acesso
         </button>
+        <button class="tab-btn" onclick="switchTab('conifg-tab', this)">
+            <i class="fa-solid fa-cog"></i> Configuração GateMesh
+        </button>
     </div>
 
     <!-- System Parameters Tab -->
@@ -67,6 +70,7 @@
             </table>
         </div>
     </div>
+
 
     <!-- Project Parameters Tab -->
     <div id="project-tab" class="tab-content">
@@ -144,7 +148,21 @@
             </form>
         </div>
     </div>
+
+     <div id="conifg-tab" class="tab-content">
+        <div class="espace_1">
+    <h1>Configuração do Projeto</h1>
+    <form action="{{ url_for('Monitor.parameters_saved') }}" method="POST">
+    <textarea id="autoTextarea" name="project_config" class="form-control" rows="3" placeholder="Configuração do Projeto" style=" resize: vertical;">
+    {{project_config}}
+    </textarea>
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    </form>
+    </div>
 </div>
+</div>
+
+
 
 <!-- Modal Dialog Overlay -->
 <div class="dialog-overlay" id="param-modal">
@@ -269,5 +287,24 @@
             closeModal();
         }
     }
+
+TextField= setInterval(function() {
+    ajustarAltura(textarea);
+    console.log("Ss")
+    clearInterval(TextField);
+}, 10);
+
+const textarea = document.getElementById("autoTextarea");
+
+  function ajustarAltura(el) {
+    el.style.height = "auto";          // reseta altura
+    el.style.height = el.scrollHeight + "px"; // ajusta para caber o conteúdo
+  }
+
+  // Ajusta ao carregar conteúdo inicial
+  ajustarAltura(textarea);
+
+  // Ajusta conforme o usuário digita
+  textarea.addEventListener("click", () => ajustarAltura(textarea));
 </script>
 {% endblock %}

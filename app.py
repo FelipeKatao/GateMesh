@@ -3,6 +3,7 @@ from pathlib import Path
 import yaml
 from flask import Flask,Blueprint
 
+from GateMonitor.api import Api_GateMesh
 from GateMonitor.monitor import Monitor
 
 
@@ -116,6 +117,8 @@ def create_app() -> Flask:
 
 app = create_app()
 app.register_blueprint(Monitor)
+app.register_blueprint(Api_GateMesh)
+
 app.secret_key = "gatemesh-monitor-secret-key-change-me"
 
 

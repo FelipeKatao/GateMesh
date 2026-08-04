@@ -125,12 +125,41 @@ def monitoring_status():
 @Monitor.route('/parameters')
 @login_required
 def parameters():
+    
     db = get_db()
     params = db.query(Parameter).all()
     # Separate parameters by category
     system_params = [p for p in params if p.category == 'system']
     project_params = [p for p in params if p.category == 'project']
-    return render_template('parameters.html', system_params=system_params, project_params=project_params)
+
+    # z= yaml_to_custom_text(CONFIG_FILE)
+    # with open(CONFIG_FILE, "r", encoding="utf-8") as file:
+    #     data = yaml.safe_load(file)
+    # salvar_yaml(data, "saida.yml")
+
+    return render_template('parameters.html', system_params=system_params, project_params=project_params,project_config= yaml_to_custom_text(CONFIG_FILE))
+
+@Monitor.route('/parameters/saved', methods=['POST'])
+@login_required
+def parameters_saved():
+    db = get_db()
+    params = db.query(Parameter).all()
+    # Separate parameters by category
+    system_params = [p for p in params if p.category == 'system']
+    project_params = [p for p in params if p.category == 'project']
+
+    form = request.form.get('project_config')
+    try:
+        data = yaml.safe_load(form)
+    except yaml.YAMLError as e:
+        print("Erro ao carregar YAML:", e)
+        return "Configuração inválida", 400
+
+    
+    salvar_yaml(data,CONFIG_FILE)
+
+    return render_template('parameters.html', system_params=system_params, project_params=project_params,project_config= yaml_to_custom_text(CONFIG_FILE))
+
 
 @Monitor.route('/parameters/add', methods=['POST'])
 @login_required
@@ -251,3 +280,51 @@ def docs():
 @Monitor.route('/docs/<page>', methods=['GET'])
 def docs_page(page):
     return render_template("/docs/"+page+'.html')
+
+import yaml
+
+
+import yaml
+
+def yaml_to_custom_text(config_file):
+    with open(config_file, "r", encoding="utf-8") as file:
+        data = str(file.read()).replace(" ","")
+        print(data)
+        if data in "host:":
+                    data += "\t"+data
+    return data
+
+    # def format_dict(d, indent=0):
+    #     lines = []
+    #     for key, value in d.items():
+    #         if isinstance(value, dict):
+    #             lines.append(" " * indent + f"{key}:")
+    #             lines.extend(format_dict(value, indent + 2))
+    #         elif isinstance(value, list):
+    #             lines.append(" " * indent + f"{key}:")
+    #             for item in value:
+    #                 if isinstance(item, dict):
+    #                     lines.extend(format_dict(item, indent + 2))
+    #                 else:
+    #                     lines.append(" " * (indent + 2) + f"- {item}")
+    #         else:
+    #             # Regras especiais
+    #             if key == "name":
+    #                 lines.append(" " * indent + f"- name: {value}")
+    #             elif key == "target":
+    #                 lines.append(" " * indent + f"{key}: {value}\n")
+    #             else:
+    #                 lines.append(" " * indent + f"{key}: {value}")
+    #     return lines
+
+    # return "\n".join(format_dict(data))
+
+
+def salvar_yaml(data, output_file):
+    with open(output_file, "w", encoding="utf-8") as file:
+        yaml.safe_dump(
+            data,
+            file,
+            sort_keys=False,          # mantém ordem das chaves
+            default_flow_style=False  # força estilo linha a linha
+        )
