@@ -3,7 +3,7 @@ gateway:
   port: 8000
 routes:
 - name: users
-  path: /
+  path: /userCheck
   target: http://localhost:5001
 - name: DataBase
   path: /_gateway/config

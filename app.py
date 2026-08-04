@@ -1,10 +1,11 @@
 from pathlib import Path
 
 import yaml
-from flask import Flask,Blueprint
+from flask import Flask,Blueprint, g
 
 from GateMonitor.api import Api_GateMesh
 from GateMonitor.monitor import Monitor
+from GateMonitor_package.GateMonitorHttp import GateMonitorHttp
 
 
 BASE_DIR = Path(__file__).resolve().parent
