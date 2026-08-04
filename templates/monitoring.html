@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Monitoramento | GateMesh Monitor{% endblock %}
+
+{% block page_title %}Painel de Monitoramento{% endblock %}
+
+{% block header_actions %}
+<div style="display: flex; align-items: center; gap: 1rem;">
+    <span class="last-updated" id="last-updated">Atualizando...</span>
+    <button id="refresh-btn" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+        <i class="fa-solid fa-arrows-rotate"></i>
+        <span>Atualizar</span>
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Metrics Cards -->
+<div class="metrics-row">
+    <div class="metric-card">
+        <div class="metric-icon cyan">
+            <i class="fa-solid fa-server"></i>
+        </div>
+        <div class="metric-details">
+            <div class="metric-value" id="total-services">{{ routes|length }}</div>
+            <div class="metric-label">Serviços Configurados</div>
+        </div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon success">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="metric-details">
+            <div class="metric-value" id="online-services">0</div>
+            <div class="metric-label">Serviços Online</div>
+        </div>
+    </div>
+    
+    <div class="metric-card">
+        <div class="metric-icon violet">
+            <i class="fa-solid fa-door-open"></i>
+        </div>
+        <div class="metric-details">
+            <div class="metric-value">{{ gateway.get('port', 8000) }}</div>
+            <div class="metric-label">Porta Gateway</div>
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-icon success" style="background: rgba(0, 242, 254, 0.1); color: var(--color-cyan);">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="metric-details">
+            <div class="metric-value" style="font-size: 1.25rem; color: var(--color-cyan);">Ativo</div>
+            <div class="metric-label">Status Gateway</div>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 1.5rem;">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fa-solid fa-network-wired" style="color: var(--color-cyan);"></i>
+            <span>Status das Rotas do Gateway</span>
+        </h3>
+    </div>
+    
+    <div class="services-grid" id="services-container">
+        {% for route in routes %}
+        <div class="card service-card" id="service-{{ route.name }}" style="padding: 1.5rem; margin-bottom: 0;">
+            <div class="service-header">
+                <div class="service-name">{{ route.name|upper }}</div>
+                <span class="status-badge checking" id="status-badge-{{ route.name }}">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <span>Verificando</span>
+                </span>
+            </div>
+            
+            <div class="service-details">
+                <div class="detail-row">
+                    <span class="detail-label">Rota:</span>
+                    <span class="detail-value" style="color: var(--color-cyan);">{{ route.path }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Destino:</span>
+                    <span class="detail-value">{{ route.target }}</span>
+                </div>
+                <div class="detail-row" style="margin-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem;">
+                    <span class="detail-label">Resposta:</span>
+                    <span class="detail-value" id="status-detail-{{ route.name }}">-</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 2rem;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; margin-bottom: 1rem; color: var(--color-warning);"></i>
+            <p>Nenhuma rota configurada no gateway.yml.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const refreshBtn = document.getElementById("refresh-btn");
+        const lastUpdated = document.getElementById("last-updated");
+        const onlineCountEl = document.getElementById("online-services");
+        
+        async function checkStatus() {
+            refreshBtn.disabled = true;
+            refreshBtn.querySelector("i").classList.add("fa-spin");
+            lastUpdated.textContent = "Verificando...";
+            
+            try {
+                const response = await fetch("{{ url_for('Monitor.monitoring_status') }}");
+                const data = await response.json();
+                
+                let onlineCount = 0;
+                
+                data.services.forEach(service => {
+                    const badge = document.getElementById(`status-badge-${service.name}`);
+                    const detail = document.getElementById(`status-detail-${service.name}`);
+                    const card = document.getElementById(`service-${service.name}`);
+                    
+                    if (badge) {
+                        if (service.status === "Online") {
+                            badge.className = "status-badge online";
+                            badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Online</span>`;
+                            onlineCount++;
+                            if (card) card.style.borderColor = "rgba(0, 230, 118, 0.25)";
+                        } else {
+                            badge.className = "status-badge offline";
+                            badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> <span>Offline</span>`;
+                            if (card) card.style.borderColor = "rgba(255, 23, 68, 0.25)";
+                        }
+                    }
+                    
+                    if (detail) {
+                        detail.textContent = service.detail;
+                        detail.style.color = service.status === "Online" ? "var(--color-success)" : "var(--color-danger)";
+                    }
+                });
+                
+                onlineCountEl.textContent = onlineCount;
+                
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                lastUpdated.textContent = `Atualizado às ${timeString}`;
+            } catch (error) {
+                console.error("Erro ao verificar status dos serviços:", error);
+                lastUpdated.textContent = "Erro na atualização";
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.querySelector("i").classList.remove("fa-spin");
+            }
+        }
+        
+        // Initial run
+        checkStatus();
+        
+        // Event listener for manual refresh
+        refreshBtn.addEventListener("click", checkStatus);
+        
+        // Auto refresh every 30 seconds
+        setInterval(checkStatus, 30000);
+    });
+</script>
+{% endblock %}

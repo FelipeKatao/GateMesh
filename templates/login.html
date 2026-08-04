@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | GateMesh Monitor{% endblock %}
+
+{% block login_content %}
+<div class="login-card">
+    <div class="login-logo">
+        <i class="fa-solid fa-network-wired"></i>
+    </div>
+    <div class="login-header">
+        <h2>GateMesh</h2>
+        <p>Acesse o painel de monitoramento</p>
+    </div>
+    
+    <form action="{{ url_for('Monitor.login') }}" method="POST">
+        <div class="form-group">
+            <label for="username">USUÁRIO</label>
+            <div class="input-container">
+                <input type="text" id="username" name="username" class="form-control" placeholder="Digite seu usuário" required autofocus>
+                <i class="fa-solid fa-user"></i>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">SENHA</label>
+            <div class="input-container">
+                <input type="password" id="password" name="password" class="form-control" placeholder="Digite sua senha" required>
+                <i class="fa-solid fa-lock"></i>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">
+            <span>Entrar no Painel</span>
+            <i class="fa-solid fa-right-to-bracket"></i>
+        </button>
+    </form>
+</div>
+{% endblock %}

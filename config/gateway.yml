@@ -1,0 +1,21 @@
+gateway:
+  host: 0.0.0.0
+  port: 8000
+
+routes:
+
+  - name: users
+    path: /api/users
+    target: http://localhost:5001
+
+  - name: orders
+    path: /api/orders
+    target: http://localhost:5002
+
+  - name: auth
+    path: /api/auth
+    target: http://localhost:5003
+
+  - name: DataBase
+    path: /_gateway/config
+    target: http://localhost:8000

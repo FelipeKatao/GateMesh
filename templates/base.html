@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GateMesh Monitor{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    {% if session.get('user_id') %}
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-network-wired"></i>
+                <span>GateMesh</span>
+            </div>
+            
+            <nav style="flex: 1;">
+                <ul class="nav-menu">
+                    <li class="nav-item {% if request.path == '/monitoring' or request.path == '/' %}active{% endif %}">
+                        <a href="{{ url_for('Monitor.monitoring') }}">
+                            <i class="fa-solid fa-chart-line"></i>
+                            <span>Monitoramento</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.path == '/parameters' %}active{% endif %}">
+                        <a href="{{ url_for('Monitor.parameters') }}">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Parâmetros</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item {% if request.path.startswith('/docs') %}active{% endif %}">
+                        <a href="{{ url_for('Monitor.docs') }}">
+                            <i class="fa-solid fa fa-book"></i>
+                            <span>Documentação</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ session.get('username', 'U')[0].upper() }}
+                    </div>
+                    <div class="user-details">
+                        <span class="username" title="{{ session.get('username') }}">{{ session.get('username') }}</span>
+                        <span class="role">Administrador</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('Monitor.logout') }}" class="btn-logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Sair</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <main class="main-content">
+            <header class="header">
+                <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
+                {% block header_actions %}{% endblock %}
+            </header>
+            
+            <div class="content-body">
+                <!-- Alerts / Flashes -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    <div class="alerts-container">
+                      {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                          <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-circle-xmark{% else %}fa-circle-info{% endif %}"></i>
+                          <span>{{ message }}</span>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    {% else %}
+    <div class="login-wrapper">
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <!-- Alerts for Login -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="alerts-container" style="max-width: 420px;">
+                  {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                      <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-circle-xmark{% else %}fa-circle-info{% endif %}"></i>
+                      <span>{{ message }}</span>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+            
+            {% block login_content %}{% endblock %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

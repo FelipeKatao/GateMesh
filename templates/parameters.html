@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+
+{% block title %}Parâmetros | GateMesh Monitor{% endblock %}
+
+{% block page_title %}Configurações & Parâmetros{% endblock %}
+
+{% block header_actions %}
+<button onclick="openAddModal()" class="btn btn-primary">
+    <i class="fa-solid fa-plus"></i>
+    <span>Novo Parâmetro</span>
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('system-tab', this)">
+            <i class="fa-solid fa-gears"></i> Parâmetros do Sistema
+        </button>
+        <button class="tab-btn" onclick="switchTab('project-tab', this)">
+            <i class="fa-solid fa-diagram-project"></i> Parâmetros do Projeto
+        </button>
+        <button class="tab-btn" onclick="switchTab('auth-tab', this)">
+            <i class="fa-solid fa-user-shield"></i> Dados de Acesso
+        </button>
+    </div>
+
+    <!-- System Parameters Tab -->
+    <div id="system-tab" class="tab-content active">
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Chave</th>
+                        <th>Valor</th>
+                        <th>Descrição</th>
+                        <th style="width: 120px; text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for param in system_params %}
+                    <tr>
+                        <td><span class="param-key">{{ param.key }}</span></td>
+                        <td><span class="param-value" title="{{ param.value }}">{{ param.value }}</span></td>
+                        <td>{{ param.description or '-' }}</td>
+                        <td>
+                            <div class="actions-cell">
+                                <button onclick="openEditModal('{{ param.id }}', '{{ param.key }}', '{{ param.value }}', '{{ param.description or '' }}')" class="btn-icon edit-btn" title="Editar">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <form action="{{ url_for('Monitor.parameters_delete', param_id=param.id) }}" method="POST" onsubmit="return confirm('Deseja realmente remover o parâmetro &quot;{{ param.key }}&quot;?');" style="display:inline;">
+                                    <button type="submit" class="btn-icon delete-btn" title="Excluir">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                            Nenhum parâmetro de sistema cadastrado. Clique em "Novo Parâmetro" para adicionar.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Project Parameters Tab -->
+    <div id="project-tab" class="tab-content">
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Chave</th>
+                        <th>Valor</th>
+                        <th>Descrição</th>
+                        <th style="width: 120px; text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for param in project_params %}
+                    <tr>
+                        <td><span class="param-key">{{ param.key }}</span></td>
+                        <td><span class="param-value" title="{{ param.value }}">{{ param.value }}</span></td>
+                        <td>{{ param.description or '-' }}</td>
+                        <td>
+                            <div class="actions-cell">
+                                <button onclick="openEditModal('{{ param.id }}', '{{ param.key }}', '{{ param.value }}', '{{ param.description or '' }}')" class="btn-icon edit-btn" title="Editar">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <form action="{{ url_for('Monitor.parameters_delete', param_id=param.id) }}" method="POST" onsubmit="return confirm('Deseja realmente remover o parâmetro &quot;{{ param.key }}&quot;?');" style="display:inline;">
+                                    <button type="submit" class="btn-icon delete-btn" title="Excluir">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                            Nenhum parâmetro de projeto cadastrado. Clique em "Novo Parâmetro" para adicionar.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Account Data Tab -->
+    <div id="auth-tab" class="tab-content" style="max-width: 500px; margin: 0 auto; padding: 1rem 0;">
+        <div class="card" style="background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.05);">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <i class="fa-solid fa-user-shield" style="font-size: 2.5rem; color: var(--color-cyan); margin-bottom: 0.5rem;"></i>
+                <h4>Atualizar Credenciais</h4>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.25rem;">Atualize o usuário ou a senha de administração</p>
+            </div>
+            
+            <form action="{{ url_for('Monitor.parameters_change_password') }}" method="POST">
+                <div class="form-group">
+                    <label for="admin-username">USUÁRIO ATUAL</label>
+                    <div class="input-container">
+                        <input type="text" id="admin-username" name="username" class="form-control" value="{{ session.get('username') }}" placeholder="Usuário" required>
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="admin-password">NOVA SENHA (DEIXE EM BRANCO PARA NÃO ALTERAR)</label>
+                    <div class="input-container">
+                        <input type="password" id="admin-password" name="password" class="form-control" placeholder="Digite uma nova senha">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Salvar Alterações</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Dialog Overlay -->
+<div class="dialog-overlay" id="param-modal">
+    <div class="dialog-box">
+        <div class="dialog-header">
+            <h3 id="modal-title">Novo Parâmetro</h3>
+            <button onclick="closeModal()" class="dialog-close"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <form id="param-form" action="{{ url_for('Monitor.parameters_add') }}" method="POST">
+            <div class="form-group" id="key-field-group">
+                <label for="param-key">CHAVE DO PARÂMETRO</label>
+                <div class="input-container">
+                    <input type="text" id="param-key" name="key" class="form-control" placeholder="EX: url_sistema" style="padding-left: 1rem;" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="param-value">VALOR</label>
+                <div class="input-container">
+                    <input type="text" id="param-value" name="value" class="form-control" placeholder="Digite o valor do parâmetro" style="padding-left: 1rem;" required>
+                </div>
+            </div>
+
+            <div class="form-group" id="category-field-group">
+                <label for="param-category">CATEGORIA</label>
+                <div class="input-container">
+                    <select id="param-category" name="category" class="form-control" style="padding-left: 1rem; appearance: none; background-color: var(--bg-secondary);">
+                        <option value="system">Sistema Base</option>
+                        <option value="project">Projeto</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="param-desc">DESCRIÇÃO</label>
+                <div class="input-container">
+                    <textarea id="param-desc" name="description" class="form-control" rows="3" placeholder="Descrição curta do propósito deste parâmetro" style="padding-left: 1rem; resize: vertical;"></textarea>
+                </div>
+            </div>
+            
+            <div class="dialog-footer">
+                <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function switchTab(tabId, btn) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        // Remove active class from all buttons
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.classList.remove('active');
+        });
+        
+        // Show target tab content and set button as active
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    const modal = document.getElementById('param-modal');
+    const paramForm = document.getElementById('param-form');
+    const modalTitle = document.getElementById('modal-title');
+    const paramKey = document.getElementById('param-key');
+    const paramValue = document.getElementById('param-value');
+    const paramCategory = document.getElementById('param-category');
+    const paramDesc = document.getElementById('param-desc');
+    const keyFieldGroup = document.getElementById('key-field-group');
+    const categoryFieldGroup = document.getElementById('category-field-group');
+
+    function openAddModal() {
+        modalTitle.textContent = "Novo Parâmetro";
+        paramForm.action = "{{ url_for('Monitor.parameters_add') }}";
+        
+        // Reset and enable fields
+        paramKey.value = "";
+        paramKey.disabled = false;
+        paramKey.required = true;
+        keyFieldGroup.style.display = "flex";
+        
+        paramValue.value = "";
+        paramCategory.value = "system";
+        categoryFieldGroup.style.display = "flex";
+        
+        paramDesc.value = "";
+        
+        modal.style.display = "flex";
+    }
+
+    function openEditModal(id, key, value, desc) {
+        modalTitle.textContent = `Editar Parâmetro: ${key}`;
+        paramForm.action = `/parameters/update/${id}`;
+        
+        // Hide key input (we only edit value and description for existing params)
+        paramKey.value = key;
+        paramKey.disabled = true;
+        paramKey.required = false;
+        keyFieldGroup.style.display = "none";
+        
+        categoryFieldGroup.style.display = "none";
+        
+        paramValue.value = value;
+        paramDesc.value = desc;
+        
+        modal.style.display = "flex";
+    }
+
+    function closeModal() {
+        modal.style.display = "none";
+    }
+
+    // Close modal if clicked outside
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+{% endblock %}
