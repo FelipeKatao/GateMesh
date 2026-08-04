@@ -24,7 +24,6 @@ def init_db():
             db.add(admin)
             db.commit()
     except Exception as e:
-        print(f"Error seeding database: {e}")
         db.rollback()
     finally:
         db.close()

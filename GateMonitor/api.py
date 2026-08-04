@@ -4,10 +4,12 @@ from pathlib import Path
 from flask import Blueprint, render_template, redirect, url_for, request, session, flash, jsonify, g
 from GateMonitor_package.GateMonitorHttp import GateMonitorHttp
 
+
 Api_GateMesh = Blueprint('api', __name__)
 BASE_DIR = Path(__file__).resolve().parent
 CONFIG_FILE = f"config\\gateway.yml"
 GateMonitor = GateMonitorHttp()
+
 
 @Api_GateMesh.route('/_gateway/service/<service>', methods=['GET'])
 def gateway_config(service):    
@@ -24,6 +26,7 @@ def gateway_config(service):
                          GateMonitor.CreateConfigsToServer(data["config_register"],data["app"])
                          return {"Call_service": "Config register"}
                     Url = i["target"]+"/"+data["service"]    
+
                     response = GateMonitor.HttpRequestGet(Url,data)
                     return {"Call_service": response.json()}
                      

@@ -99,7 +99,7 @@ def monitoring_status():
         try:
             req = urllib.request.Request(target, method='GET')
             # set a short timeout of 1 second for local checks
-            with urllib.request.urlopen(req, timeout=1.0) as response:
+            with urllib.request.urlopen(req, timeout=6.0) as response:
                 status = "Online"
                 detail = f"HTTP {response.status}"
         except urllib.error.HTTPError as e:
@@ -152,7 +152,6 @@ def parameters_saved():
     try:
         data = yaml.safe_load(form)
     except yaml.YAMLError as e:
-        print("Erro ao carregar YAML:", e)
         return "Configuração inválida", 400
 
     
@@ -289,7 +288,6 @@ import yaml
 def yaml_to_custom_text(config_file):
     with open(config_file, "r", encoding="utf-8") as file:
         data = str(file.read()).replace(" ","")
-        print(data)
         if data in "host:":
                     data += "\t"+data
     return data
