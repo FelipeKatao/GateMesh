@@ -1,14 +1,21 @@
 
+import requests
+
+from GateMonitor_package.gmcCopiler import GmcCopiler
 from data.repo.Conections_repo import Conections_repo
 from data.repo.Parans_repo import ParansRepo
 
+    
 
 class GateMonitorHttp():
-    def __init__(self,host=0,port=0,db="GateMonitor_db"):
+    def __init__(self,data,host=0,port=0,db="GateMonitor_db"):
         self.host = host
         self.port = port
         self.repo_parans = ParansRepo(db)
         self.Conection_repo = Conections_repo(db)
+        self.Gmc_code = GmcCopiler(data)
+        self.parans = data
+        self.Value_response = ""
 
     def HttpRequestGet(self,url,headers=None,params=None,method="GET"):
         import requests
@@ -21,8 +28,24 @@ class GateMonitorHttp():
         return requests.get(url,headers=headers)
         
     def CreateConfigsToServer(self,config,server):
-        with open(f"config\\"+server+".gmc", "w") as f:
+        with open(f"config\\"+server+".gmc", "w" ,encoding= "utf-8") as f:
             f.write(config)
 
     def GetToken(self,ProjectName):
         return self.repo_parans.get_by_name("apptoken_"+ProjectName)
+
+    def ExecuteGmcFile(self,code):
+        self.Gmc_code.Compile(code)
+        # Validar Load Balance 
+        if self.Gmc_code.ServiceUse_ == "{@parans}":
+             self.Gmc_code.ServiceUse_ = self.parans["service"]
+        Count = self.Conection_repo.CountCons(self.Gmc_code.ServiceUse_,self.parans["target"].replace("http://","").replace("https://",""))
+        if  int(Count) > int(self.Gmc_code.LimitRequest_):
+            if self.Gmc_code.absolute_request:
+                if self.Gmc_code.LimitRequest_redirect == "":
+                    print("s")
+                    return {"error":"LimitRequest"}
+                return self.HttpRequestGet(self.Gmc_code.absolute_request+"/"+self.Gmc_code.LimitRequest_redirect,headers=self.parans)
+            return self.HttpRequestGet(self.parans["target"]+"/"+self.Gmc_code.LimitRequest_redirect,headers=self.parans)
+        else:
+           return self.HttpRequestGet(self.parans["target"]+"/"+self.Gmc_code.ServiceUse_,headers=self.parans)

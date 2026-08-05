@@ -671,6 +671,7 @@ a:hover {
 /* Data Table */
 .data-table-container {
     overflow-x: auto;
+    height: 70vh;
 }
 
 .data-table {

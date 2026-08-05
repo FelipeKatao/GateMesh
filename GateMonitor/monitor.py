@@ -1,4 +1,6 @@
+import datetime
 import os
+import threading
 import yaml
 import urllib.request
 import urllib.error
@@ -6,6 +8,8 @@ from pathlib import Path
 from flask import Blueprint, render_template, redirect, url_for, request, session, flash, jsonify, g
 from data.models import SessionLocal, User, Parameter
 from functools import wraps
+
+from data.models.conections import Conections
 
 Monitor = Blueprint('Monitor', __name__)
 
@@ -121,6 +125,21 @@ def monitoring_status():
         })
         
     return jsonify({"services": status_results})
+
+@Monitor.route('/monitoring/connections')
+@login_required
+def monitoring_connections():
+    db = get_db()
+    connections = db.query(Conections).order_by(Conections.id.desc()).all()
+    results = []
+    for conn in connections:
+        results.append({
+            "id": conn.id,
+            "ip": conn.ip,
+            "port": conn.port,
+            "service": conn.Service
+        })
+    return jsonify({"connections": results})
 
 @Monitor.route('/parameters')
 @login_required
@@ -326,3 +345,27 @@ def salvar_yaml(data, output_file):
             sort_keys=False,          # mantém ordem das chaves
             default_flow_style=False  # força estilo linha a linha
         )
+
+
+def limpar_loop():
+    import time
+    while True:
+        db = SessionLocal()
+        try:
+            registros = (
+                db.query(Conections)
+                .order_by(Conections.id.asc())
+                .limit(5)
+                .all()
+            )
+            for r in registros:
+                db.delete(r)
+
+            db.commit()
+        except Exception as e:
+            db.rollback()
+        finally:
+            db.close()
+        time.sleep(60)
+
+threading.Thread(target=limpar_loop, daemon=True).start()

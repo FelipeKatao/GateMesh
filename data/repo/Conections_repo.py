@@ -14,3 +14,6 @@ class Conections_repo:
         conections = Conections(ip=ip,port=port,Service=service)
         self.db.add(conections)
         self.db.commit()
+
+    def CountCons(self,ServiceName,port):
+        return self.db.query(Conections).filter(Conections.Service == ServiceName, Conections.port == port).count()

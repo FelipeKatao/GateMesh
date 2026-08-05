@@ -102,17 +102,32 @@
 </div>
 
 <div class="card" style="margin-top: 1.5rem;">
-<div class="card-header">
+    <div class="card-header">
         <h3 class="card-title">
-            <i class="fa-solid fa-network-wired" style="color: var(--color-cyan);"></i>
-            <span>Requisições do Gateway</span>
+            <i class="fa-solid fa-exchange-alt" style="color: var(--color-cyan);"></i>
+            <span>Requisições do Gateway (Connections)</span>
         </h3>
     </div>
 
-    <div class="metrics-grid">
-        
+    <div class="data-table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width: 80px;">ID</th>
+                    <th>IP</th>
+                    <th>Porta</th>
+                    <th>Serviço</th>
+                </tr>
+            </thead>
+            <tbody id="connections-tbody">
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                        Carregando conexões...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-
 </div>
 
 {% endblock %}
@@ -173,14 +188,63 @@
             }
         }
         
+        const connectionsTbody = document.getElementById("connections-tbody");
+        
+        async function loadConnections() {
+            try {
+                const response = await fetch("{{ url_for('Monitor.monitoring_connections') }}");
+                const data = await response.json();
+                
+                connectionsTbody.innerHTML = "";
+                
+                if (!data.connections || data.connections.length === 0) {
+                    connectionsTbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                                Nenhuma requisição registrada.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                data.connections.forEach(conn => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${conn.id}</td>
+                        <td>${conn.ip}</td>
+                        <td><span class="param-value" style="font-family: monospace;">${conn.port}</span></td>
+                        <td><span class="param-key">${conn.service}</span></td>
+                    `;
+                    connectionsTbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Erro ao carregar conexões:", error);
+                connectionsTbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--color-danger); padding: 2rem;">
+                            Erro ao carregar conexões.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
         // Initial run
         checkStatus();
+        loadConnections();
         
         // Event listener for manual refresh
-        refreshBtn.addEventListener("click", checkStatus);
+        refreshBtn.addEventListener("click", () => {
+            checkStatus();
+            loadConnections();
+        });
         
         // Auto refresh every 30 seconds
-        setInterval(checkStatus, 30000);
+        setInterval(() => {
+            checkStatus();
+            loadConnections();
+        }, 30000);
     });
 </script>
 {% endblock %}
