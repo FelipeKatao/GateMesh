@@ -34,7 +34,6 @@ def gateway_config(service):
                              data_ = f.read()
                     RespondeData = GateMonitor.ExecuteGmcFile(data_)
                     if isinstance(RespondeData, dict):
-                         print("ue")
                          return {"Call_service": RespondeData}
                     if RespondeData.status_code == 404:
                          return {"Call_service": "Service dont exist"}

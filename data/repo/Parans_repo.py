@@ -12,3 +12,6 @@ class ParansRepo:
 
     def get_by_name(self, name):
         return self.db.query(Parameter.value).filter(Parameter.key == name).first()
+
+    def Get_token_user_by_name(self,name):
+        return self.db.query(Parameter.value).filter(Parameter.key == "token_user",Parameter.value == name,Parameter.category == "project").first()

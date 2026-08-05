@@ -36,6 +36,18 @@ class GateMonitorHttp():
 
     def ExecuteGmcFile(self,code):
         self.Gmc_code.Compile(code)
+
+        #Verificar permissão
+        if self.Gmc_code.resource_allow == False:
+            return {"error":"Resource not Autorized"}
+        #validar serviço disponivel
+        if self.Gmc_code.check == False:
+             if self.Gmc_code.RedirectFail != "":
+                 if self.Gmc_code.absolute_request:
+                      return self.HttpRequestGet(self.Gmc_code.absolute_request+"/"+self.Gmc_code.RedirectFail,headers=self.parans)
+                 return self.HttpRequestGet(self.parans["target"]+"/"+self.Gmc_code.RedirectFail,headers=self.parans)
+             return self.HttpRequestGet(self.parans["target"]+"/"+self.Gmc_code.ServiceUse_,headers=self.parans)
+
         # Validar Load Balance 
         if self.Gmc_code.ServiceUse_ == "{@parans}":
              self.Gmc_code.ServiceUse_ = self.parans["service"]
@@ -43,7 +55,6 @@ class GateMonitorHttp():
         if  int(Count) > int(self.Gmc_code.LimitRequest_):
             if self.Gmc_code.absolute_request:
                 if self.Gmc_code.LimitRequest_redirect == "":
-                    print("s")
                     return {"error":"LimitRequest"}
                 return self.HttpRequestGet(self.Gmc_code.absolute_request+"/"+self.Gmc_code.LimitRequest_redirect,headers=self.parans)
             return self.HttpRequestGet(self.parans["target"]+"/"+self.Gmc_code.LimitRequest_redirect,headers=self.parans)
