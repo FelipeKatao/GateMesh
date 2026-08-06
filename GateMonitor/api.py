@@ -41,7 +41,3 @@ def gateway_config(service):
                     return {"Call_service": RespondeData.json()}
                      
     return {"Call_service": "Service dont exist"}
-
-
-
-

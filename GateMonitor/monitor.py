@@ -10,6 +10,7 @@ from data.models import SessionLocal, User, Parameter
 from functools import wraps
 
 from data.models.conections import Conections
+from data.models.logs import Logs
 
 Monitor = Blueprint('Monitor', __name__)
 
@@ -78,6 +79,18 @@ def logout():
     session.clear()
     flash('Você saiu do sistema.', 'info')
     return redirect(url_for('Monitor.login'))
+
+@Monitor.route('/logs')
+@login_required
+def logs():
+    return render_template('logs.html')
+
+@Monitor.route('/logs/load')
+@login_required
+def load_logs():
+    logs =  get_db()
+    Logs_con = logs.query(Logs).order_by(Logs.id.desc()).all()
+    return jsonify({"Result": [log.to_dict() for log in Logs_con]})
 
 @Monitor.route('/monitoring')
 @login_required

@@ -38,6 +38,13 @@
                             <span>Documentação</span>
                         </a>
                     </li>
+
+                   <li class="nav-item {% if request.path == '/logs' %}active{% endif %}">
+                        <a href="{{ url_for('Monitor.logs') }}">
+                            <i class="fa-solid fa fa-book"></i>
+                            <span>Logs</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
             

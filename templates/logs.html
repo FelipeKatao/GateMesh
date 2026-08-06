@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Logs | GateMesh Monitor{% endblock %}
+
+{% block page_title %}Logs de Conexão{% endblock %}
+
+
+{% block content %}
+
+        <div class="data-table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+
+                    <th>id</th>
+                    <th>timestamp</th>
+                    <th>message</th>
+                    <th>ResposeHttp</th>
+                    <th>Alert</th>
+                    <th>service</th>
+                    <th>RouteRequest</th>
+                    <th>Time</th>
+                    <th>MemoryCoast</th>
+                </tr>
+            </thead>
+            <tbody id="connections-tbody">
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                        Carregando conexões...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+ const connectionsTbody = document.getElementById("connections-tbody");
+        
+
+
+        async function loadConnections() {
+            try {
+                const response = await fetch("{{ url_for('Monitor.load_logs') }}");
+                const data = await response.json();
+                
+                connectionsTbody.innerHTML = "";
+                
+                if (!data.connections || data.connections.length === 0) {
+                    connectionsTbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                                Nenhuma requisição registrada.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                data.connections.forEach(conn => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${conn.id}</td>
+                        <td>${conn.timestamp}</td>
+                        <td><span class="param-value" style="font-family: monospace;">${conn.message}</span></td>
+                        <td><span class="param-key">${conn.ResposeHttp}</span></td>
+                        <td><span class="param-key">${conn.Alert}</span></td>
+                        <td><span class="param-key">${conn.service}</span></td>
+                        <td><span class="param-key">${conn.RouteRequest}</span></td>
+                        <td><span class="param-key">${conn.Time}</span></td>
+                        <td><span class="param-key">${conn.MemoryCoast}</span></td>
+                    `;
+                    connectionsTbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error("Erro ao carregar conexões:", error);
+                connectionsTbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--color-danger); padding: 2rem;">
+                            Erro ao carregar conexões.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+    setInterval(() => {
+            loadConnections();
+    }, 30000);
+    loadConnections();
+</script>
+{% endblock %}
