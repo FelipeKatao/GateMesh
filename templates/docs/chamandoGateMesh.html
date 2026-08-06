@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Docs | GateMesh Monitor{% endblock %}
+{% block page_title %}Documentação{% endblock %}
+
+{% block content %}
+<div class="header_docs">
+{% include 'menudocs.html' %}
+<div class="content_docs">
+
+    <h1> Realizando chamadas ao GateMesh </h1>
+    <h3>Conectando seu serviço com o GateMesh</h3>
+
+    <article>
+        <p> O GateMesh se conecta com a s suaaplicação atraves de uma chamado HTTP a API do Gatemesh </p>
+        <div>
+            Ao Colocar o codigo de chamada na sua aplicação o GateMesh vai ser capaz de chamar o  codigo e assim realizar o tartamento para 
+            redirecionar ao serviço destino  atraves da configuração dentro do GateMesh ( que será abordada mais para frente)
+        </div>
+
+        <br>
+        <h3>Configurando o GateMesh Monitor</h3>
+        <p>A Rota que faz a chamada ao GateMesh Monitor é a seguinte:</p>
+        <code>
+            <pre>
+
+                RouteCall = "http://localhost/_gateway/service/users"
+                Header = {"service": "name","method":"GET", "role": "admin","token":"XXXX","userToken":0000,"app":"name"}
+                //Realizar chamada Http
+
+            </pre>
+        </code>
+        
+        <p>
+            Dentro da chamada é necessario enviar parametros importantes atraves do Header da chamada, cada um desses parametros é necessaria para
+            fazer funções especificas ou para conseguir realizar o tratamento da chamada.<br> 
+            Abaixo uma explicação para que serve cada um desses parametros:
+            <ul>
+                <li>service: Nome do serviço que deseja realizar a chamada</li>
+                <li>method: Metodo que deseja realizar a chamada (GET,POST,PUT,DELETE)</li>
+                <li>role: Permissão que deseja realizar a chamada (admin, user, guest) </li>
+                <li>token: Token que deseja realizar a chamada para realizar a autenticação da sua aplicação com a aplicação destino. </li> 
+                <li>userToken: Token que deseja realizar a chamada para fazer autenticação de permissão do usuario</li>
+                <li>app: Nome da aplicação que deseja realizar a chamada</li>
+            </ul>            
+        </p>
+
+        <h4>Configurando GateMesh Monitor</h4>
+        <p>
+            Após criar a rota para chamada agora é necessario, configurar o Monitor para ser capaz de entender qual serviço o cliente estará usando dentro 
+            da sua aplicação para que isso seja possivel, dentro da aba Parâmetros > Configuração GateMesh ,  deverá configurar quais serviços o sisetma 
+            estara usando para realizar as chamadas e em endereço ele esta alocado: 
+        </p>
+
+        <code>
+            <pre>
+
+            gateway:
+            host:0.0.0.0
+            port:8000
+            routes:
+                -name:NomeService
+                path:/
+                target:http://localhost
+
+            </pre>
+        </code>
+        <p>
+            As primeiras linhas são a configuração geral do Gatemesh podendo configurar qual porta e qual host ele está localizado para ser
+            executado no computador local ou em servidores. <br>
+
+            <h4>Criando parametros</h4>
+            Dentro dde Parâmetros > Parâmetro do sistema, crie  a CHAVE que vai ser usada para autenticar a sua aplicação com o GateMesh desta maneira 
+            permitindo a aplicação de executar as rotas e serviços do GateMesh.
+
+            <code>
+                <pre>
+
+                    chave: appttoken_nomeProjeto
+                    Valor: XXXX
+
+                </pre>
+            </code>
+            <br>
+            Lembre-se que para a  chave para ser valida para autenticação ela deve <b>Sempre começar</b> com "appttoken_" sem isso o sistema não 
+            consegue localziar a sua chave de conexão com o GateMesh.<br>
+
+            <h4>Executando o serviço</h4>
+            Agora quando for executar a sua rota configurada para o GateMesh ela vai ser capaz de realizar o tratamento para redirecionar ao serviço destino.<br>
+            Ainda não temos a configuração de redirecionamento,LoadBalance ou politicas, mas isso vai ser abordado mais para frente.
+        </p>
+    </article>
+    </div>
+</div>
+{% endblock%}
