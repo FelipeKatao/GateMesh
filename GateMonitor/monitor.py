@@ -90,7 +90,11 @@ def logs():
 def load_logs():
     logs =  get_db()
     Logs_con = logs.query(Logs).order_by(Logs.id.desc()).all()
-    return jsonify({"Result": [log.to_dict() for log in Logs_con]})
+    serialized = [log.to_dict() for log in Logs_con]
+    return jsonify({
+        "Result": serialized,
+        "connections": serialized
+    })
 
 @Monitor.route('/monitoring')
 @login_required
@@ -382,3 +386,23 @@ def limpar_loop():
         time.sleep(60)
 
 threading.Thread(target=limpar_loop, daemon=True).start()
+
+
+def classify_http_status(status_code: int) -> str:
+    """
+    Classifica o status HTTP em categorias:
+    - 2xx → Ok
+    - 3xx → Warning (redirecionamentos)
+    - 4xx → Erro (cliente)
+    - 5xx → Crítico (servidor)
+    """
+    if 200 <= status_code < 300:
+        return "Ok"
+    elif 300 <= status_code < 400:
+        return "Warning"
+    elif 400 <= status_code < 500:
+        return "Erro"
+    elif 500 <= status_code < 600:
+        return "Crítico"
+    else:
+        return "Desconhecido"

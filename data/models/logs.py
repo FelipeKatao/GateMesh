@@ -12,3 +12,16 @@ class Logs(Base):
     RouteRequest = Column(String(100), nullable=False)
     Time = Column(String(100), nullable=False)
     MemoryCoast = Column(String(100), nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "timestamp": self.timestamp.strftime("%Y-%m-%d %H:%M:%S") if self.timestamp else "",
+            "message": self.message,
+            "ResposeHttp": self.ResposeHttp,
+            "Alert": self.Alert,
+            "service": self.service,
+            "RouteRequest": self.RouteRequest,
+            "Time": self.Time,
+            "MemoryCoast": self.MemoryCoast
+        }

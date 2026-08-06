@@ -24,7 +24,7 @@ class GateMonitorHttp():
             options = Options_[1].split("/")
             self.Conection_repo.CreateNewCon("0000",options[0],options[1])
             return requests.get(url,headers=headers)
-
+    
         return requests.get(url,headers=headers)
         
     def CreateConfigsToServer(self,config,server):

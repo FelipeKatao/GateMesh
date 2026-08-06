@@ -6,6 +6,7 @@ from flask import Flask,Blueprint, g
 from GateMonitor.api import Api_GateMesh
 from GateMonitor.monitor import Monitor
 from GateMonitor_package.GateMonitorHttp import GateMonitorHttp
+from data.models import init_db
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -93,6 +94,8 @@ def validate_config(config: dict) -> None:
 
 
 def create_app() -> Flask:
+    # Initialize SQLite database and tables
+    init_db()
 
     config = load_config(CONFIG_FILE)
 

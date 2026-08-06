@@ -25,7 +25,7 @@
             </thead>
             <tbody id="connections-tbody">
                 <tr>
-                    <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                    <td colspan="9" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
                         Carregando conexões...
                     </td>
                 </tr>
@@ -49,25 +49,28 @@
                 
                 connectionsTbody.innerHTML = "";
                 
-                if (!data.connections || data.connections.length === 0) {
+                const logsList = data.connections || data.Result || [];
+                
+                if (logsList.length === 0) {
                     connectionsTbody.innerHTML = `
                         <tr>
-                            <td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
+                            <td colspan="9" style="text-align: center; color: var(--text-secondary); padding: 2rem;">
                                 Nenhuma requisição registrada.
                             </td>
                         </tr>
                     `;
                     return;
                 }
-                
-                data.connections.forEach(conn => {
+                let VarWarning = {"Ok": "color:green", "Warning": "color:yellow", "Erro": "color:red", "Crítico": "color:orange", "Desconhecido": "color:gray"};
+                logsList.forEach(conn => {
                     const row = document.createElement("tr");
+                    
                     row.innerHTML = `
                         <td>${conn.id}</td>
                         <td>${conn.timestamp}</td>
                         <td><span class="param-value" style="font-family: monospace;">${conn.message}</span></td>
                         <td><span class="param-key">${conn.ResposeHttp}</span></td>
-                        <td><span class="param-key">${conn.Alert}</span></td>
+                        <td><span style='${VarWarning[conn.Alert]}'>${conn.Alert}</span></td>
                         <td><span class="param-key">${conn.service}</span></td>
                         <td><span class="param-key">${conn.RouteRequest}</span></td>
                         <td><span class="param-key">${conn.Time}</span></td>
@@ -79,7 +82,7 @@
                 console.error("Erro ao carregar conexões:", error);
                 connectionsTbody.innerHTML = `
                     <tr>
-                        <td colspan="4" style="text-align: center; color: var(--color-danger); padding: 2rem;">
+                        <td colspan="9" style="text-align: center; color: var(--color-danger); padding: 2rem;">
                             Erro ao carregar conexões.
                         </td>
                     </tr>
@@ -89,7 +92,7 @@
 
     setInterval(() => {
             loadConnections();
-    }, 30000);
+    }, 5000);
     loadConnections();
 </script>
 {% endblock %}
