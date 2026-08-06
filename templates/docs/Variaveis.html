@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Docs | GateMesh Monitor{% endblock %}
+{% block page_title %}Documentação{% endblock %}
+
+{% block content %}
+<div class="header_docs">
+{% include 'menudocs.html' %}
+<div class="content_docs">
+    <h1> Variaveis </h1>
+    <h3>Criando Variaveis e utilizando</h3>
+
+    <article class="article">
+        <p>Dentro do gateMesh code tem a possibilidade de criar variaveis imutaveis, e também de utiliza-las em varios campos futuros  </p>
+        <code>
+            <br>
+            <pre>
+               var Limite_request_qtd = 6 
+               limit_request = Limite_request_qtd
+            </pre>
+        </code>
+        <div>
+            Neste caso o valor da variavel "limit_request" vai ser o mesmo valor da variavel "Limite_request_qtd", para criar uma variavel ela deve ter "var"  no incio e depois do nome da variavel colocar o "=" e o valor da variavel, nenhuma variavel pode inciar com valor nulo.
+            Para utilizar ela coloque o mesmo nome da variavel no campo que deseja utilizar, nesse caso o campo "limit_request" vai receber o valor da variavel "Limite_request_qtd".
+        </div>
+
+    </article>
+    </div>
+</div>
+{% endblock%}

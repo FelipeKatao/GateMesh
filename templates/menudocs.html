@@ -2,7 +2,12 @@
     <ul>
      <a href="{{ url_for('Monitor.docs') }}">   <li >Introdução </li> </a>
      <a href="{{ url_for('Monitor.docs_page',page='GateMeshMonitor') }}">   <li >GatMesh Monitor </li> </a>
-     <a href="{{ url_for('Monitor.docs_page',page='GateMeshMonitor') }}">   <li>GateMesh Code project</li>  </a>
+     <a href="{{ url_for('Monitor.docs_page',page='GateMeshMonitor') }}">   <li>GateMesh Code project
+        <ul>
+            <a href="{{ url_for('Monitor.docs_page',page='Variaveis') }}">   <li>Variaveis</li> </a>
+            <a href="{{ url_for('Monitor.docs_page',page='UseSelector') }}">   <li>@use</li> </a>
+        </ul>
+     </li>  </a>
 
     </ul>
     

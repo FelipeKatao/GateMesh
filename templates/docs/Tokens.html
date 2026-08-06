@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Docs | GateMesh Monitor{% endblock %}
+{% block page_title %}Documentação{% endblock %}
+
+{% block content %}
+<div class="header_docs">
+{% include 'menudocs.html' %}
+<div class="content_docs">
+    <h1> import uses </h1>
+    <h3>Organziando seu codigo e criando camadas</h3>
+
+    <article class="article">
+        <p>o GateMesh permite o uso de "import uses" que tem as mais divesas funções para organizar o seu codigo </p>
+        <br>
+        <h3>@use selector_service</h3>
+        <p>Ao utilizar esse seletor você vai permitir a criação de camadas isoladas para cada rota ou serviço.</p>
+        <code>
+            <br>
+            <pre>
+            @use selector_service
+
+                @Rota_001 
+                    var z = 4
+                    ...
+                @end 
+
+                @Rota_002
+                    var z = 9                
+                    ...
+                @end
+
+            </pre>
+        </code>
+        <div>
+            O use de  selector_service serve para ativar o uso do selector_service , para criar um novo selector_service basta criar uma variavel com o mesmo nome da rota, e dentro dela adicionar as funcoes da rota, cada seletor representado por @ apos o uso de @use selector_service
+            siginica que cada rota deve ter uma variavel com o mesmo nome da rota, e dentro dela adicionar as funcoes da rota, cada seletor representado por @ apos o uso de @use selector_service.<br>
+            Lembrando que quando se usa o Seletor as variaveis e funções ficam restritas aquela seleção, apenas aquela rota executa ela , selecionada pelo selector do serviço.
+        </div>
+
+    </article>
+    </div>
+</div>
+{% endblock%}

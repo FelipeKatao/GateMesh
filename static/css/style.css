@@ -667,7 +667,9 @@ a:hover {
 .tab-content.active {
     display: block;
 }
-
+.article{
+    width: 100%;
+}
 /* Data Table */
 .data-table-container {
     overflow-x: auto;
