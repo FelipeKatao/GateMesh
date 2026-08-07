@@ -1,5 +1,5 @@
 gateway:
-  host: 0.0.0.1
+  host: 0.0.0.0
   port: 8000
 routes:
 - name: users
@@ -8,6 +8,3 @@ routes:
 - name: DataBase
   path: /_gateway/config
   target: http://localhost:8000
-- name: Clientes
-  path: /
-  target: http://localhost:5021

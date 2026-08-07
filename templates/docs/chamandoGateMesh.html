@@ -25,7 +25,7 @@
             <pre>
 
                 RouteCall = "http://localhost/_gateway/service/users"
-                Header = {"service": "name","method":"GET", "role": "admin","token":"XXXX","userToken":0000,"app":"name"}
+                Header = {"service": "name","method":"GET", "role": "admin","token":"XXXX","userToken":0000,"app":"name","config_register": config}
                 //Realizar chamada Http
 
             </pre>
@@ -42,6 +42,7 @@
                 <li>token: Token que deseja realizar a chamada para realizar a autenticação da sua aplicação com a aplicação destino. </li> 
                 <li>userToken: Token que deseja realizar a chamada para fazer autenticação de permissão do usuario</li>
                 <li>app: Nome da aplicação que deseja realizar a chamada</li>
+                <li>config_register: Configuração do projeto</li>
             </ul>            
         </p>
 
@@ -88,6 +89,26 @@
             <h4>Executando o serviço</h4>
             Agora quando for executar a sua rota configurada para o GateMesh ela vai ser capaz de realizar o tratamento para redirecionar ao serviço destino.<br>
             Ainda não temos a configuração de redirecionamento,LoadBalance ou politicas, mas isso vai ser abordado mais para frente.
+            <br>
+            <br><h4>Fazendo upload do GateMesh Code para o GateMesh Monitor</h4>
+            Para que o GateMesh reconheça seu sistema e realize as chamadas ao GateMesh Monitor, basta fazer o upload do GateMesh Monitor para o GateMesh Monitor,
+            para fazer isso o usuario precisa subir o arquvivo .gmc atraves da rota HTTP seguindo esses parâmetros:
+
+            <code>
+                <pre>
+
+                    with open('config_server.gmc') as f:
+                        config = f.read()   
+                    RouteCall = "http://localhost/_gateway/service/upload"
+                    Header = {"service": "name","method":"GET", "role": "admin","token":"XXXX","userToken":0000,"app":"name","config_register": config}
+                    ...
+
+                </pre>    
+            </code>
+
+            No lugar de SUA CONFIGURAÇÃO deverá colocar a configuração do GateMesh Monitor, no exemplo acima utiliamos python para isso, mas caso utilize outra linguagem
+            segue a mesma logica, faça a leitura do arquivo .gmc e coloque a configuração dentro da variavel "config" atraves do tipo str (string).<br>
+            Nesse primeiro momento pode subir esse arquivo vazio depois poderá subir novamente atualziando o arquivo com a configuração atualizada.
         </p>
     </article>
     </div>

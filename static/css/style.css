@@ -183,6 +183,53 @@ a:hover {
     font-size: 0.9rem;
 }
 
+code {
+margin-top:4vh;
+margin-bottom:4vh;
+  display: block;
+  background: var(--bg-secondary);
+  color: #c5c8c6;
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 0 8px var(--border-glow);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* Barra de rolagem estilo IDE */
+code::-webkit-scrollbar {
+  height: 8px;
+}
+code::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+code::-webkit-scrollbar-thumb {
+  background: var(--border-glow);
+  border-radius: 4px;
+}
+
+/* Destaque de sintaxe básico */
+.token.keyword {
+  color: #00f2fe;
+}
+.token.string {
+  color: #f1fa8c;
+}
+.token.comment {
+  color: #6272a4;
+  font-style: italic;
+}
+.token.function {
+  color: #50fa7b;
+}
+.token.number {
+  color: #bd93f9;
+}
+
 .user-details {
     display: flex;
     flex-direction: column;
@@ -385,6 +432,18 @@ a:hover {
 .form-control {
     width: 100%;
     height: 90vh;
+    padding: 0.85rem 1rem 0.85rem 2.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.form-control_text {
+    width: 100%;
     padding: 0.85rem 1rem 0.85rem 2.5rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
