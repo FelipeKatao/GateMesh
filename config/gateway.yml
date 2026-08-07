@@ -8,3 +8,6 @@ routes:
 - name: DataBase
   path: /_gateway/config
   target: http://localhost:8000
+- name: ConsultClient
+  path: /_gateway/config
+  target: http://localhost:5021

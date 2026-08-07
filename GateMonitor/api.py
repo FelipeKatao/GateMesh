@@ -38,10 +38,26 @@ def gateway_config(service):
                     start = time.perf_counter()
                     RespondeData = GateMonitor.ExecuteGmcFile(data_)
                     elapsed = time.perf_counter() - start
-                    size_bytes = len(RespondeData.content)
-                    size_mb = size_bytes / (1024 * 1024)
-                    timestamp = datetime.datetime.now()
-                    Alert = classify_http_status(RespondeData.status_code)
+                    content = ""
+
+                    if not  isinstance(RespondeData,dict):
+                        size_bytes = len(content)
+                        size_mb = size_bytes / (1024 * 1024)
+                        timestamp = datetime.datetime.now()
+                        Alert = classify_http_status(RespondeData.status_code)
+                    else:
+                        Alert = "Warning"
+                        Response = 403
+                        timestamp = datetime.datetime.now()
+                        url = ""
+                        if RespondeData.get("AbsoluteRequest") is not None:
+                            url = RespondeData.get("AbsoluteRequest")
+                        else:
+                            url = RespondeData.get("target")
+                        url = url+"/"+RespondeData.get("Route")
+                        LogRepo.CreateNewLog(timestamp,"Limit Exceeded",Response,Alert,data["app"],url,elapsed,0)
+                        return {"Call_service": "Limit Exceeded"}
+
                     if isinstance(RespondeData, dict):
                         LogRepo.CreateNewLog(timestamp,RespondeData.text,RespondeData.status_code,Alert,data["app"],RespondeData.url,elapsed,size_mb)
                         return {"Call_service": RespondeData}

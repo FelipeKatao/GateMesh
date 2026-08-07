@@ -55,7 +55,7 @@ class GateMonitorHttp():
         if  int(Count) > int(self.Gmc_code.LimitRequest_):
             if self.Gmc_code.absolute_request:
                 if self.Gmc_code.LimitRequest_redirect == "":
-                    return {"error":"LimitRequest"}
+                    return {"error":"LimitRequest","target":self.parans["target"],"Route":self.Gmc_code.ServiceUse_,"AbsoluteRequest":self.Gmc_code.absolute_request}
                 return self.HttpRequestGet(self.Gmc_code.absolute_request+"/"+self.Gmc_code.LimitRequest_redirect,headers=self.parans)
             return self.HttpRequestGet(self.parans["target"]+"/"+self.Gmc_code.LimitRequest_redirect,headers=self.parans)
         else:
