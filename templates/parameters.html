@@ -153,7 +153,7 @@
         <div class="espace_1">
     <h1>Configuração do Projeto</h1>
     <form action="{{ url_for('Monitor.parameters_saved') }}" method="POST">
-    <textarea id="autoTextarea" name="project_config" class="form-control" rows="3" placeholder="Configuração do Projeto" style=" resize: vertical;">
+    <textarea id="autoTextarea" name="project_config" class="form-control" rows="3" placeholder="Configuração do Projeto" style="height: 90vh; resize: vertical;">
     {{project_config}}
     </textarea>
     <button type="submit" class="btn btn-primary">Salvar</button>

@@ -5,7 +5,7 @@ import yaml
 import urllib.request
 import urllib.error
 from pathlib import Path
-from flask import Blueprint, render_template, redirect, url_for, request, session, flash, jsonify, g
+from flask import Blueprint, json, render_template, redirect, url_for, request, session, flash, jsonify, g
 from data.models import SessionLocal, User, Parameter
 from functools import wraps
 
@@ -186,12 +186,25 @@ def parameters_saved():
 
     form = request.form.get('project_config')
     try:
-        data = yaml.safe_load(form)
-    except yaml.YAMLError as e:
-        return "Configuração inválida", 400
+        # tenta interpretar como JSON
+        data = json.loads(form)
+    except Exception:
+        # se não for JSON, tenta como YAML
+        clean_str = form.replace("\r\n", "\n").strip()
+        data = yaml.safe_load(clean_str)
 
+    with open(CONFIG_FILE, "w", encoding="utf-8") as file:
+        yaml.safe_dump(
+            data,
+            file,
+            sort_keys=False,
+            default_flow_style=False,
+            allow_unicode=True,
+            indent=2,
+            width=80
+        )
     
-    salvar_yaml(data,CONFIG_FILE)
+
 
     return render_template('parameters.html', system_params=system_params, project_params=project_params,project_config= yaml_to_custom_text(CONFIG_FILE))
 
@@ -322,11 +335,25 @@ import yaml
 import yaml
 
 def yaml_to_custom_text(config_file):
+    """
+    Lê um arquivo YAML e retorna o texto formatado corretamente
+    para o front renderizar com indentação e espaçamento adequados.
+    """
     with open(config_file, "r", encoding="utf-8") as file:
-        data = str(file.read()).replace(" ","")
-        if data in "host:":
-                    data += "\t"+data
-    return data
+        # Carrega o YAML como dict
+        data = yaml.safe_load(file)
+
+    # Converte de volta para string YAML bem formatada
+    formatted = yaml.safe_dump(
+        data,
+        sort_keys=False,
+        default_flow_style=False,
+        allow_unicode=True,
+        indent=2,
+        width=80
+    )
+
+    return formatted
 
     # def format_dict(d, indent=0):
     #     lines = []
@@ -355,12 +382,16 @@ def yaml_to_custom_text(config_file):
 
 
 def salvar_yaml(data, output_file):
+    print(data)
     with open(output_file, "w", encoding="utf-8") as file:
         yaml.safe_dump(
             data,
             file,
-            sort_keys=False,          # mantém ordem das chaves
-            default_flow_style=False  # força estilo linha a linha
+            sort_keys=False,           # mantém ordem das chaves
+            default_flow_style=False,  # estilo linha a linha
+            allow_unicode=True,        # suporta caracteres especiais
+            indent=2,                  # indentação padrão
+            width=80                   # quebra de linha amigável
         )
 
 
